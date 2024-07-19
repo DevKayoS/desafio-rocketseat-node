@@ -62,4 +62,26 @@ export class Database {
 
     return data
   }
+  // criando rota para deletar task
+  delete(table, id){
+    const rowIndex = this.#database[table].findIndex(row => row.id === id)
+
+     // se tiver aquele dado no banco de dados sera deletado
+     if(rowIndex > -1){
+      this.#database[table].splice(rowIndex, 1)
+      this.#persist()
+    }
+  }
+    // metodo para completar a task
+    complete(table, id, data){
+      //procurando a task no banco de dados e verificando se o id que veio da requisição é o mesmo do que o que esta no db
+      const rowIndex = this.#database[table].findIndex(row => row.id === id)
+      // se tiver aquele dado no banco de dados sera atualizado
+      if(rowIndex > -1){
+        this.#database[table][rowIndex] = {id, ...data}
+        this.#persist()
+      }
+  
+      return data
+    }
 }

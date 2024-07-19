@@ -46,13 +46,13 @@ Rotas:
     
     Antes de realizar a atualização, deve ser feito uma validação se o `id` pertence a uma task salva no banco de dados.
     
-- `DELETE - /tasks/:id`
+- `DELETE - /tasks/:id` (x)
     
     Deve ser possível remover uma task pelo `id`.
     
     Antes de realizar a remoção, deve ser feito uma validação se o `id` pertence a uma task salva no banco de dados.
     
-- `PATCH - /tasks/:id/complete`
+- `PATCH - /tasks/:id/complete` (x)
     
     Deve ser possível marcar a task como completa ou não. Isso significa que se a task estiver concluída, deve voltar ao seu estado “normal”.
     
