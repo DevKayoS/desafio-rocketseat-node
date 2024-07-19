@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import { Database } from './database.js'
+import { buildRoutePath } from './utils/build-route-path.js'
 
 const database = new Database()
 
@@ -7,7 +8,7 @@ export const routes = [
   {
     //rota de criacao de nova task
     method: 'POST',
-    path: '/task',
+    path: buildRoutePath('/tasks'),
     handler: (req,res) => {
       //pegando os dados que vieram do corpo da requisicao
       const {title, description} = req.body
@@ -16,24 +17,64 @@ export const routes = [
         id: randomUUID(),
         title,
         description,
-        completed_at: 0,
+        completed_at: null,
         created_at: new Date(),
         updated_at: new Date()
       }
       // salvando no banco
-      database.insert('task', task)
+      database.insert('tasks', task)
 
       return res.writeHead(201).end()
     }
   },
   {
-    // criando rota para resgatar todas as tasks
+    //rota para pegar todas as tasks ou pegar as tasks filtradas
     method: 'GET',
-    path: '/task',
+    path: buildRoutePath('/tasks'),
+    handler: (req, res) => {
+      const { search } = req.query
+
+      const tasks = database.select('tasks', {
+        title: search,
+        description: search
+      })
+
+      return res.end(JSON.stringify(tasks))
+    }
+  },
+  {
+    //rota de atualização de task
+    method: 'PUT',
+    path: buildRoutePath('/tasks/:id'),
     handler: (req,res) => {
-      const data = database.select('task')
-        
-      return res.end(JSON.stringify(data))
+      //pegando o id que veio pelos parametros da requisição
+      const {id} = req.params
+      //validando o id
+      if(!id){
+        return res.writeHead(404).end()
+      }
+
+      //pegando os dados que vieram do corpo da requisicao
+      const {title, description} = req.body
+
+      if(!title && !description){
+        return res.writeHead(400).end(JSON.stringify({ message: 'title or description are required' }))
+      }
+      //pegando os dados do banco
+      const [tasks] = database.select('tasks', { id })
+      //criando objeto para ser salvo no banco
+      const updatedTask = {
+        id,
+        title: title ?? tasks.title,
+        description: description ?? tasks.description,
+        completed_at: tasks.completed_at,
+        created_at: tasks.created_at,
+        updated_at: new Date()
+      }
+      // atualizando no banco
+      database.update('tasks', id, updatedTask)
+
+      return res.writeHead(204).end(JSON.stringify(updatedTask))
     }
   },
 
