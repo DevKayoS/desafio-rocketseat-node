@@ -23,8 +23,8 @@ export const routes = [
       }
       // salvando no banco
       database.insert('tasks', task)
-
-      return res.writeHead(201).end()
+      //retornando os dados criados
+      return res.writeHead(201).end(JSON.stringify(task))
     }
   },
   {
